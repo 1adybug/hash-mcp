@@ -1,0 +1,15 @@
+node_modules
+package-lock.json
+pnpm-lock.yaml
+bun.lock
+bun.lockb
+dist
+build
+yarn.lock
+yarn-error.log
+.yarnrc.yml
+.yarn
+test.js
+test.mjs
+test.ts
+test

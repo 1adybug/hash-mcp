@@ -1,0 +1,23 @@
+{
+    "name": "md5-mcp",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.ts",
+    "scripts": {
+        "build": "docker build -t luzixu/md5-mcp ."
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "dependencies": {
+        "fastmcp": "^1.22.2",
+        "md5": "^2.3.0",
+        "zod": "^3.24.3"
+    },
+    "devDependencies": {
+        "@types/md5": "^2.3.5",
+        "@types/node": "^22.14.1",
+        "typescript": "^5.8.3"
+    }
+}
