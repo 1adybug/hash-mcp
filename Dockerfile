@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # 安装依赖
-RUN bun install
+RUN bun install --registry=https://registry.npmmirror.com
 
 # 暴露服务器端口
 EXPOSE 80
