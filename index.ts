@@ -46,6 +46,6 @@ server.start({
     transportType: "sse",
     sse: {
         port: 80,
-        endpoint: "/",
+        endpoint: "/sse",
     },
 })
