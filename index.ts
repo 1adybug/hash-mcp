@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js"
+import consola from "consola"
 import cors from "cors"
 import { createHash } from "crypto"
 import express, { NextFunction, Request, Response } from "express"
@@ -85,7 +86,9 @@ app.get("/sse", async (request, response) => {
     const transport = new SSEServerTransport("/messages", response)
 
     // 获取sessionId
-    const sessionId = transport.sessionId
+    const { sessionId } = transport
+
+    consola.success(`SSE 连接建立: ${sessionId}`)
 
     // 注册连接
     connections.set(sessionId, transport)
@@ -93,13 +96,24 @@ app.get("/sse", async (request, response) => {
     // 将传输对象与MCP服务器连接
     await server.connect(transport)
 
+    consola.success(`MCP 连接建立: ${sessionId}`)
+
+    //   // 发送心跳包以保持连接
+    const heartbeatInterval = setInterval(() => response.write(": ping - " + new Date().toISOString() + "\n\n"), 30000)
+
     // 连接中断处理
-    request.on("close", () => connections.delete(sessionId))
+    request.on("close", () => {
+        consola.warn(`SSE 连接断开: ${sessionId}`)
+        connections.delete(sessionId)
+        clearInterval(heartbeatInterval)
+    })
 })
 
 // 接收客户端消息的端点
 app.post("/messages", async (request: Request, response: Response) => {
     const sessionId = request.query.sessionId as string
+
+    consola.info(`收到消息: ${sessionId}`)
 
     if (typeof sessionId !== "string" || !sessionId) throw new CustomError("无效的 sessionId")
 
@@ -112,6 +126,7 @@ app.post("/messages", async (request: Request, response: Response) => {
 
 // 错误处理
 app.use((error: Error, request: Request, response: Response, next: NextFunction) => {
+    consola.error(error.message)
     if (error instanceof CustomError) {
         response.status(400).json({ error: error.message })
         return
@@ -119,4 +134,4 @@ app.use((error: Error, request: Request, response: Response, next: NextFunction)
     response.status(500).json({ error: "服务器内部错误" })
 })
 
-app.listen(80)
+app.listen(80, "0.0.0.0", () => consola.success("服务启动成功: http://0.0.0.0:80/sse"))
